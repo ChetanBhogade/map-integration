@@ -10,6 +10,7 @@ import React, {useEffect, useState} from 'react';
 import {API_KEY} from '@env';
 import axios from 'axios';
 import MapScreen from './Components/MapScreen';
+import GetLocation from 'react-native-get-location';
 
 // Formula from - http://www.movable-type.co.uk/scripts/latlong.html
 const calculateDistance = (lat1, lon1, lat2, lon2) => {
@@ -32,6 +33,7 @@ const App = () => {
   const [tableData, setTableData] = useState([]);
   const [rangeLocations, setRangeLocations] = useState([]);
   const [showMap, setShowMap] = useState(false);
+  const [currentLocation, setCurrentLocation] = useState({});
 
   const callAPI = () => {
     axios
@@ -46,10 +48,22 @@ const App = () => {
       .catch(err => {
         console.log('Got an error: - ', err);
       });
+
+    GetLocation.getCurrentPosition({
+      enableHighAccuracy: true,
+      timeout: 15000,
+    })
+      .then(location => {
+        console.log('Current location: ', location);
+        setCurrentLocation(location);
+      })
+      .catch(error => {
+        const {code, message} = error;
+        console.warn('Got an error: ', code, message);
+      });
   };
 
   useEffect(() => {
-    console.log('Env variables: - ', API_KEY);
     callAPI();
   }, []);
 
@@ -77,8 +91,8 @@ const App = () => {
     for (let index = 0; index < tableData.length; index++) {
       const element = tableData[index];
       const distance = calculateDistance(
-        19.4445035, // my location
-        72.8235646, // my location
+        currentLocation.latitude, // 19.4445035, // my location
+        currentLocation.longitude, // 72.8235646, // my location
         element.Latitude,
         element.Longitude,
       );
@@ -99,7 +113,7 @@ const App = () => {
   );
 
   return showMap ? (
-    <MapScreen listOfData={tableData} />
+    <MapScreen currentLocation={currentLocation} listOfData={tableData} />
   ) : (
     <View style={styles.container}>
       <TouchableOpacity
@@ -114,7 +128,7 @@ const App = () => {
           <FlatList
             data={rangeLocations}
             renderItem={renderItem}
-            keyExtractor={item => item.LocationID}
+            keyExtractor={(item, index) => index}
           />
         </View>
       )}

@@ -3,14 +3,7 @@ import React from 'react';
 import MapView, {Marker} from 'react-native-maps';
 
 const MapScreen = props => {
-  const currentLocation = {
-    latitude: 19.4445035,
-    longitude: 72.8235646,
-    latitudeDelta: 0.01,
-    longitudeDelta: 0.01,
-  };
-
-  console.log("listOfData: ", props.listOfData)
+  console.log('listOfData: ', props.listOfData);
 
   return (
     <View style={styles.container}>
@@ -19,21 +12,26 @@ const MapScreen = props => {
         style={styles.map}
         //specify our coordinates.
         initialRegion={{
-          latitude: 19.4445035,
-          longitude: 72.8235646,
+          latitude: props.currentLocation.latitude, // 19.4445035,
+          longitude: props.currentLocation.longitude, // 72.8235646,
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         }}>
-        <Marker coordinate={currentLocation} />
-        {props.listOfData && props.listOfData.map((item, index) => {
-          return (
-            <Marker
-              key={index}
-              coordinate={{latitude: item.Latitude, longitude: item.Longitude, latitudeDelta: 0.01, longitudeDelta: 0.01}}
-              pinColor="#8e44ad"
-            />
-          );
-        })}
+        {props.listOfData &&
+          props.listOfData.map((item, index) => {
+            return (
+              <Marker
+                key={index}
+                coordinate={{
+                  latitude: item.Latitude,
+                  longitude: item.Longitude,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.01,
+                }}
+                pinColor="#8e44ad"
+              />
+            );
+          })}
       </MapView>
     </View>
   );
